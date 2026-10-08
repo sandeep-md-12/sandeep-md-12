@@ -3,8 +3,8 @@
     pip install pillow numpy opencv-python rembg
     python scripts/prep_photo.py path/to/photo.jpg
 
-Removes the background, boosts local contrast (CLAHE) and composites onto
-white -> source-prepped.png, which make_ascii_svg.py picks up automatically.
+Removes the background, boosts local contrast (CLAHE) and keeps the cut-out
+mask as alpha -> source-prepped.png, which make_ascii_svg.py picks up automatically.
 """
 import os
 import sys
@@ -34,12 +34,13 @@ def main():
 
     # crop to the subject's bounding box with a little margin
     alpha = np.array(cut.split()[-1])
+    out = Image.merge("LA", [Image.fromarray(gray), Image.fromarray(alpha)])
     ys, xs = np.where(alpha > 20)
     if len(xs):
         m = 20
-        gray = gray[max(ys.min() - m, 0):ys.max() + m, max(xs.min() - m, 0):xs.max() + m]
+        out = out.crop((max(xs.min() - m, 0), max(ys.min() - m, 0), xs.max() + m, ys.max() + m))
 
-    Image.fromarray(gray).save(OUT)
+    out.save(OUT)  # gray + alpha
     print(f"wrote {OUT}")
 
 

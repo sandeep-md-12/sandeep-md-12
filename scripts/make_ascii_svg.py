@@ -9,7 +9,7 @@ top to bottom (SMIL), plays once and freezes. STATIC=1 -> frozen frame.
 import os
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "source-prepped.png")
@@ -22,6 +22,8 @@ W = 370
 FS = 6.4                       # font size
 CW = (W - 20) / COLS           # char advance we space to
 LH = 7.6                       # line height
+FLOOR = 0.10                   # min density inside the subject (keeps dark hair visible)
+GAMMA = 1.35
 MIN_H = 440                    # match info-card height so the table lines up
 INK = "#c9d1d9"
 BG, BORDER = "#0d1117", "#30363d"
@@ -45,8 +47,18 @@ def monogram():
 def to_rows(im):
     w, h = im.size
     rows = max(1, round(COLS * (h / w) * (CW / LH)))
-    small = np.asarray(im.convert("L").resize((COLS, rows), Image.LANCZOS), dtype=float) / 255
-    idx = ((1 - small) * (len(RAMP) - 1)).round().astype(int)
+    if im.mode in ("LA", "RGBA"):
+        # cut-out photo: light ink on dark bg, so brighter = denser; background blank
+        lum = np.asarray(im.convert("L").filter(ImageFilter.UnsharpMask(4, 160, 2))
+                         .resize((COLS, rows), Image.LANCZOS), dtype=float) / 255
+        alpha = np.asarray(im.getchannel("A").resize((COLS, rows), Image.LANCZOS), dtype=float) / 255
+        inside = lum[alpha > .5]
+        lo, hi = np.percentile(inside, 3), np.percentile(inside, 97)
+        lum = np.clip((lum - lo) / max(hi - lo, 1e-3), 0, 1)
+        dens = (FLOOR + (1 - FLOOR) * lum ** GAMMA) * alpha
+    else:
+        dens = 1 - np.asarray(im.convert("L").resize((COLS, rows), Image.LANCZOS), dtype=float) / 255
+    idx = (dens * (len(RAMP) - 1)).round().astype(int)
     return ["".join(RAMP[i] for i in r).rstrip() for r in idx]
 
 

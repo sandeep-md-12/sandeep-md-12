@@ -1,5 +1,11 @@
 <div align="center">
 
+<h3><code>sandeep@github ~ $ ./contributions.sh</code></h3>
+
+<img src="./contrib-heatmap.svg" width="860" alt="Contribution heatmap for the last year"/>
+
+<br><br>
+
 <h3><code>sandeep@github ~ $ whoami</code></h3>
 
 <table>
@@ -10,12 +16,6 @@
 </table>
 
 <br>
-
-<h3><code>sandeep@github ~ $ ./contributions.sh</code></h3>
-
-<img src="./contrib-heatmap.svg" width="860" alt="Contribution heatmap for the last year"/>
-
-<br><br>
 
 <h3><code>sandeep@github ~ $ cat contact.txt</code></h3>
 

@@ -62,7 +62,7 @@ def main():
         f'<rect x="{X + KEY_W + i * 22}" y="{sy - 10}" width="18" height="12" rx="2" fill="{c}"/>'
         for i, c in enumerate(sw)) + "</g>")
 
-    H = sy + 26
+    H = max(sy + 26, 444)  # match ascii-portrait height
     dots = "".join(f'<circle cx="{20 + i * 18}" cy="17" r="5.5" fill="{c}"/>'
                    for i, c in enumerate(["#ff5f56", "#ffbd2e", "#27c93f"]))
     anim = "" if STATIC else """
