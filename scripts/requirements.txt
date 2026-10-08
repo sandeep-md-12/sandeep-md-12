@@ -1,0 +1,5 @@
+# daily automation (GitHub Actions)
+requests==2.32.3
+beautifulsoup4==4.12.3
+# local-only, for the ASCII portrait
+# pillow numpy opencv-python rembg
